@@ -18,7 +18,7 @@ def demo_basic_livecodebench():
     task = impossible_livecodebench(
         split="oneoff",        # Use oneoff tests
         agent_type="minimal",  # Simple submission loop
-        limit=5,               # Run on first 5 samples for demo
+        limit=3,               # Run on first 5 samples for demo
     )
 
     # Run evaluation

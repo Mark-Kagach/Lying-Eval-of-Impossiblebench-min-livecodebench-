@@ -78,6 +78,9 @@ class EvalResult:
     sample_original_id: Optional[str]
     task_name: Optional[str]
     dump: Optional[str]
+    callout_prompt: Optional[str] = None
+    callout_response: Optional[str] = None
+    callout_deterministic_label: Optional[str] = None
     
     def to_dict(self, dump: bool = False) -> Dict:
         """Convert to dictionary for DataFrame creation."""
@@ -100,6 +103,9 @@ class EvalResult:
             'sample_original_id': self.sample_original_id,
             'task_name': self.task_name,
             'dump': self.dump if dump else None,
+            'callout_prompt': self.callout_prompt,
+            'callout_response': self.callout_response,
+            'callout_deterministic_label': self.callout_deterministic_label,
         }
 
 
@@ -244,12 +250,22 @@ def parse_eval_file(file_path: str) -> List[EvalResult]:
                 sample_first_pass = False
                 sample_first_score = 0.0
                 sample_dump = get_dump_of_everything(sample)
+                sample_callout_prompt = None
+                sample_callout_response = None
+                sample_callout_deterministic_label = None
                 
                 
                 if hasattr(sample, 'scores') and sample.scores:
                     # Look for specific scorer results
                     for scorer_name, score_result in sample.scores.items():
                         score_to_float = lambda v: float({'I': 0, 'C': 1}.get(v, v))
+                        score_metadata = getattr(score_result, "metadata", None)
+                        if isinstance(score_metadata, dict):
+                            callout_data = score_metadata.get("same_chat_callout", {})
+                            if isinstance(callout_data, dict):
+                                sample_callout_prompt = callout_data.get("prompt")
+                                sample_callout_response = callout_data.get("response")
+                            sample_callout_deterministic_label = score_metadata.get("callout_deterministic_label")
                         if hasattr(score_result, 'value'):
                             sample_score = score_to_float(score_result.value)
                             sample_passed = sample_score > 0.0
@@ -278,6 +294,9 @@ def parse_eval_file(file_path: str) -> List[EvalResult]:
                     else:
                         raise NotImplementedError(f'{task_metadata.get("agent_type")=} {task_display_name=}')
                 
+                if sample_callout_deterministic_label is None:
+                    sample_callout_deterministic_label = "not_applicable"
+                
                 # Create result for this sample
                 result = EvalResult(
                     file_path=file_path,
@@ -298,6 +317,9 @@ def parse_eval_file(file_path: str) -> List[EvalResult]:
                     sample_original_id=sample.id,
                     task_name=task_display_name,
                     dump=sample_dump,
+                    callout_prompt=sample_callout_prompt,
+                    callout_response=sample_callout_response,
+                    callout_deterministic_label=sample_callout_deterministic_label,
                 )
                 results.append(result)
         else:
@@ -415,6 +437,8 @@ class DataLoader:
         # Convert results to dictionaries
         data = [result.to_dict(dump=dump) for result in self.results]
         df = pd.DataFrame(data)
+        if 'callout_deterministic_label' in df.columns:
+            df['callout_deterministic_label'] = df['callout_deterministic_label'].fillna('not_applicable')
         
         # Add computed columns only for aggregated rows (sample_id=None)
         df['pass_rate'] = df.groupby(['model', 'dataset', 'variant', 'agent_type', 'prompt_id', 'modification'])['passed'].transform(lambda x: x.mean(skipna=True))
@@ -446,6 +470,20 @@ class DataLoader:
         df.loc[~aggregated_mask, 'pass_rate_err'] = float('nan')
         df.loc[~aggregated_mask, 'first_pass_rate_err'] = float('nan')
         return df
+
+    def to_sample_df(self, dump: bool = False) -> pd.DataFrame:
+        """Return only per-sample rows (drop aggregate rows)."""
+        df = self.to_df(dump=dump)
+        if df.empty:
+            return df
+        return df[df['sample_id'].notna()].copy()
+
+    def to_passed_sample_df(self, dump: bool = False) -> pd.DataFrame:
+        """Return per-sample rows that passed scoring (C)."""
+        df = self.to_sample_df(dump=dump)
+        if df.empty:
+            return df
+        return df[df['passed'] == True].copy()  # noqa: E712
     
     def get_summary(self) -> Dict[str, float]:
         """Get summary statistics.
