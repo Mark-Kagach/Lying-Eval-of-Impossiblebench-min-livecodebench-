@@ -33,6 +33,16 @@ pip install -e .
 
 For Docker-backed runs, install Docker Desktop and ensure `docker version` works.
 
+Optional extras:
+
+```bash
+# SWE-bench-only dependencies (not required for minimal LiveCodeBench ALEval path)
+pip install -e .[swe]
+
+# Optional LLM-judge analysis dependencies
+pip install -e .[analysis]
+```
+
 ## Inspect-Native Commands
 
 After installing (`pip install -e .`), you can run this fork through Inspect directly.
@@ -154,6 +164,10 @@ Open [http://localhost:7575](http://localhost:7575) and inspect per-sample score
 - `No module named impossiblebench` or stale imports:
   - run `pip install -e .`
   - if running from source, set `PYTHONPATH=src`.
+- Windows install fails while cloning `inspect_evals`:
+  - this fork no longer requires SWE dependencies for base install.
+  - run `pip install -e .` for minimal ALEval path.
+  - only install SWE extras if needed: `pip install -e .[swe]`.
 - Docker failures:
   - confirm `docker version` works and Docker Desktop daemon is running.
 - Empty report output:

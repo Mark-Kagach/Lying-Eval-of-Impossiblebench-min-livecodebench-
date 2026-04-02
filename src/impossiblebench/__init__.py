@@ -5,13 +5,17 @@ This module contains solvers and datasets for testing AI systems on:
 - HumanEval/LiveCodeBench with impossible test cases
 """
 
-# SWE-bench task imports
-from .swebench_tasks import impossible_swebench
-from .swebench_scorers import swe_bench_scorer
-
-# SWE-bench agent imports
-from .swebench_agent_mini import mini_agent_solver
-from .swebench_agent_full import multi_submission_solver
+# SWE-bench imports are optional for minimal LiveCodeBench usage.
+try:
+    from .swebench_tasks import impossible_swebench
+    from .swebench_scorers import swe_bench_scorer
+    from .swebench_agent_mini import mini_agent_solver
+    from .swebench_agent_full import multi_submission_solver
+except ImportError:
+    impossible_swebench = None
+    swe_bench_scorer = None
+    mini_agent_solver = None
+    multi_submission_solver = None
 
 # LiveCodeBench/HumanEval task imports
 from .livecodebench_tasks import (

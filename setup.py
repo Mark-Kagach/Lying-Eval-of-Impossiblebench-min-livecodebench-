@@ -21,20 +21,24 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "inspect_ai>=0.3.0",
-        "inspect_evals[swe_bench] @ git+https://github.com/UKGovernmentBEIS/inspect_evals",
         "pandas>=2.0.0",
         "datasets>=3.0.0",
         "tqdm>=4.60.0",
         "jsonlines>=4.0.0",
-        "swebench>=4.0.0",
         "platformdirs>=4.0.0",
     ],
     extras_require={
+        "swe": [
+            "inspect_evals[swe_bench] @ git+https://github.com/UKGovernmentBEIS/inspect_evals",
+            "swebench>=4.0.0",
+        ],
         "analysis": [
             "anthropic>=0.40.0",
             "litellm>=1.50.0",
         ],
         "all": [
+            "inspect_evals[swe_bench] @ git+https://github.com/UKGovernmentBEIS/inspect_evals",
+            "swebench>=4.0.0",
             "anthropic>=0.40.0",
             "litellm>=1.50.0",
         ],
