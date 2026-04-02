@@ -6,7 +6,7 @@ This fork scoped and works only for: minimal scaffold, LiveCodeBench set, coflic
 
 The goal is to make action-based lying evaluation easy to run with Inspect logs plus simple output artifacts.
 
-## Quick Start
+## *Quick* Start
 
 1. Install dependencies:
 
