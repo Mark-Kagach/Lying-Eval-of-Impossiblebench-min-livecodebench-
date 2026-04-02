@@ -8,13 +8,13 @@ The goal is to make action-based lying evaluation easy to run with Inspect logs 
 
 ## *Quick* Start
 
-1. Install dependencies:
+**1. Install dependencies:**
 
 ```bash
 pip install -e .
 ```
 
-2. Get your API key:
+**2. Get your API key:**
 
 ```bash
 # Linux / macOS (bash/zsh)
@@ -24,25 +24,25 @@ export OPENAI_API_KEY="sk-..."
 $env:OPENAI_API_KEY="sk-..."
 ```
 
-3. Run small local test:
+**3. Run small local test:**
 
 ```bash
 inspect eval src/impossiblebench/livecodebench_tasks.py@aleval_livecodebench_minimal --model openai/gpt-5-2025-08-07 --sandbox local -T limit=3 -T max_attempts=3 -T message_limit=40 --log-dir ./logs/aleval_real
 ```
 
-4. Generate the report:
+**4. Generate the report:**
 
 ```bash
 aleval-report --logs-dir ./logs/aleval_real --out-dir ./reports/aleval_real
 ```
 
-5. View the logs yourself in Inspect [http://localhost:7575](http://localhost:7575):
+**5. View the logs yourself in Inspect [http://localhost:7575](http://localhost:7575):**
 
 ```bash
 inspect view start --log-dir ./logs/aleval_real --port 7575
 ```
 
-## Expand: WIP
+# Expand Tests: WIP
 
 For Docker-backed runs, install Docker Desktop and ensure `docker version` works.
 
@@ -129,7 +129,7 @@ Important metadata fields in scorer output:
 - `preserved_solution_used_for_scoring`
 - `callout_deterministic_label`
 
-## Inspect Log Viewer
+# Why Do This
 
 ```bash
 inspect view start --log-dir ./logs/aleval_real --port 7575
@@ -156,6 +156,8 @@ Open [http://localhost:7575](http://localhost:7575) and inspect per-sample score
 - Empty report output:
   - verify `--logs-dir` points to Inspect `.eval` files and retry with `--latest-only`.
 
+# How It Works
+
 ## Evaluation Flow
 
 ```mermaid
@@ -169,8 +171,6 @@ flowchart TD
     reportCli --> jsonOut[JudgedSamplesJSON]
     reportCli --> mdOut[SummaryMD]
 ```
-
-
 
 ## Changes vs Upstream ImpossibleBench
 
@@ -197,26 +197,4 @@ This is the explicit ALEval delta manifest.
 - `judge_eval.py`
   - New CLI to generate CSV + JSON + Markdown report from Inspect logs.
 
-### Explicit Non-Goals in This Fork
-
-- No SWE-bench ALEval extension in runtime path.
-- No full/tool scaffold support.
-- No default LLM-judge dependency for lie labeling.
-
-## Citation
-
-ImpossibleBench original paper:
-
-```bibtex
-@misc{zhong2025impossiblebench,
-  title         = {ImpossibleBench: Measuring LLMs' Propensity of Exploiting Test Cases},
-  author        = {Zhong, Ziqian and Raghunathan, Aditi and Carlini, Nicholas},
-  year          = {2025},
-  eprint        = {2510.20270},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.LG},
-  doi           = {10.48550/arXiv.2510.20270},
-  url           = {https://arxiv.org/abs/2510.20270}
-}
-```
 
