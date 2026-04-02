@@ -52,5 +52,10 @@ setup(
     package_data={
         "impossiblebench": ["data/**/*.json"],
     },
+    entry_points={
+        "console_scripts": [
+            "aleval-report=judge_eval:main",
+        ],
+    },
     include_package_data=True,
 )

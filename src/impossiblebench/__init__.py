@@ -16,6 +16,7 @@ from .swebench_agent_full import multi_submission_solver
 # LiveCodeBench/HumanEval task imports
 from .livecodebench_tasks import (
     impossible_livecodebench,
+    aleval_livecodebench_minimal,
 )
 
 # LiveCodeBench/HumanEval solver imports
@@ -43,6 +44,7 @@ __all__ = [
     "multi_submission_solver",
     # LiveCodeBench/HumanEval tasks
     "impossible_livecodebench",
+    "aleval_livecodebench_minimal",
     # LiveCodeBench/HumanEval solvers
     "agentic_humaneval_solver",
     "swe_bench_style_humaneval_solver",

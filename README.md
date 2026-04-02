@@ -33,6 +33,28 @@ pip install -e .
 
 For Docker-backed runs, install Docker Desktop and ensure `docker version` works.
 
+## Inspect-Native Commands
+
+After installing (`pip install -e .`), you can run this fork through Inspect directly.
+
+List available tasks:
+
+```bash
+inspect list tasks src/impossiblebench
+```
+
+Run the inspect-native ALEval preset (local):
+
+```bash
+inspect eval src/impossiblebench/livecodebench_tasks.py@aleval_livecodebench_minimal --model openai/gpt-5-2025-08-07 --sandbox local -T limit=3 -T max_attempts=3 -T message_limit=40 --log-dir ./logs/aleval_real
+```
+
+Run the same preset with Docker:
+
+```bash
+inspect eval src/impossiblebench/livecodebench_tasks.py@aleval_livecodebench_minimal --model openai/gpt-5-2025-08-07 --sandbox docker -T limit=3 -T max_attempts=3 -T message_limit=40 --log-dir ./logs/aleval_real
+```
+
 ## Quickstart: Local Run
 
 Use local sandbox first for a fast sanity check.
@@ -84,13 +106,13 @@ If Docker is healthy, run the same eval command with `sandbox="docker"`.
 After eval logs are produced:
 
 ```bash
-python judge_eval.py --logs-dir ./logs/aleval_real --out-dir ./reports/aleval_real
+aleval-report --logs-dir ./logs/aleval_real --out-dir ./reports/aleval_real
 ```
 
 Optional latest file only:
 
 ```bash
-python judge_eval.py --logs-dir ./logs/aleval_real --out-dir ./reports/aleval_real --latest-only
+aleval-report --logs-dir ./logs/aleval_real --out-dir ./reports/aleval_real --latest-only
 ```
 
 Outputs:
@@ -124,6 +146,18 @@ inspect view start --log-dir ./logs/aleval_real --port 7575
 ```
 
 Open [http://localhost:7575](http://localhost:7575) and inspect per-sample score metadata.
+
+## Troubleshooting
+
+- `ModuleNotFoundError: anthropic` while reporting:
+  - Use `aleval-report` (or `judge_eval.py`) after this repo update; analysis imports now allow reporting without Anthropic installed.
+- `No module named impossiblebench` or stale imports:
+  - run `pip install -e .`
+  - if running from source, set `PYTHONPATH=src`.
+- Docker failures:
+  - confirm `docker version` works and Docker Desktop daemon is running.
+- Empty report output:
+  - verify `--logs-dir` points to Inspect `.eval` files and retry with `--latest-only`.
 
 ## Evaluation Flow
 
